@@ -1,16 +1,15 @@
 import Notiflix from 'notiflix';
 
 function createPromise(position, delay) {
-  const shouldResolve = Math.random() > 0.3;
-  if (shouldResolve) {
-    // Fulfill
-    return new Promise(resolve => {
-      setTimeout(() => resolve({ position, delay }), delay);
-    });
-  } else {
-    // Reject
-    return Promise.reject({ position, delay });
-  }
+  return new Promise((resolve, reject) => {
+    const shouldResolve = Math.random() > 0.3;
+    setTimeout(() => {
+      if (shouldResolve) {
+        resolve({ position, delay });
+      }
+      reject({ position, delay });
+    }, delay);
+  });
 }
 
 const formEl = document.querySelector('.form');

@@ -2,62 +2,54 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import Notiflix from 'notiflix';
 
+const inputPicker = document.querySelector('#datetime-picker');
+const btnStart = document.querySelector('[data-start]');
+const dataElem = document.querySelectorAll('.value');
+
+/* Solution throw object */
+// const obj = {
+//   days: document.querySelector('[data-days'),
+//   hours: document.querySelector('[data-hours'),
+//   minutes: document.querySelector('[data-minutes'),
+//   seconds: document.querySelector('[data-seconds'),
+// };
+
+btnStart.setAttribute('disabled', 'disabled');
+
+let selectedDate;
+let intervalId;
+
 const options = {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    const selectedDate = selectedDates[0];
+    selectedDate = selectedDates[0];
     if (selectedDate.getTime() - now().getTime() > 0) {
       btnStart.disabled = false;
-      let intervalId;
-
-      btnStart.addEventListener('click', () => {
-        btnStart.disabled = true;
-        const timer = convertMilliseconds(
-          selectedDate.getTime() - now().getTime()
-        );
-
-        let days = timer.days;
-        let hours = timer.hours;
-        let minutes = timer.minutes;
-        let seconds = timer.seconds;
-
-        timerSec.textContent = show(seconds);
-        timerMin.textContent = show(minutes);
-        timerHours.textContent = show(hours);
-        timerDays.textContent = show(days);
-
-        intervalId = setInterval(() => {
-          if (seconds > 0) {
-            seconds--;
-            timerSec.textContent = show(seconds);
-          } else if (minutes > 0) {
-            minutes--;
-            seconds = 59;
-            timerMin.textContent = show(minutes);
-            timerSec.textContent = show(seconds);
-          } else if (hours > 0) {
-            hours--;
-            minutes = 59;
-            timerHours.textContent = show(hours);
-            timerMin.textContent = show(minutes);
-          } else if (days > 0) {
-            days--;
-            hours = 23;
-            timerDays.textContent = show(days);
-            timerHours.textContent = show(hours);
-          } else {
-            clearInterval(intervalId);
-          }
-        }, 1000);
-      });
     } else {
       Notiflix.Notify.failure('Please choose a date in the future');
     }
   },
 };
+
+btnStart.addEventListener('click', () => {
+  btnStart.disabled = true;
+  inputPicker.disabled = true;
+
+  intervalId = setInterval(() => {
+    const currTime = selectedDate.getTime() - now().getTime();
+    if (currTime < 1000) {
+      clearInterval(intervalId);
+    }
+    const timer = convertMilliseconds(currTime);
+    Object.entries(timer).forEach(([, value], index) => {
+      // obj[key].textContent = show(value); // solution throw object. In this case we need to write [key, value]
+      dataElem[index].textContent = show(value);
+    });
+  }, 1000);
+});
 
 function show(num) {
   return String(num).padStart(2, '0');
@@ -65,15 +57,6 @@ function show(num) {
 function now() {
   return new Date();
 }
-
-const inputPicker = document.querySelector('#datetime-picker');
-const btnStart = document.querySelector('[data-start]');
-const timerDays = document.querySelector('[data-days');
-const timerHours = document.querySelector('[data-hours');
-const timerMin = document.querySelector('[data-minutes');
-const timerSec = document.querySelector('[data-seconds');
-
-btnStart.setAttribute('disabled', 'disabled');
 
 flatpickr(inputPicker, options);
 
